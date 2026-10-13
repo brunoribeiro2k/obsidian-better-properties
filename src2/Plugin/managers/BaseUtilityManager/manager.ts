@@ -42,8 +42,18 @@ export class BaseUtilityManager extends Component {
 	async onload(): Promise<void> {
 		this.applyVaultPatches();
 
-		await this.patchBasesController();
-		this.patchBaseResultsValue();
+		// Obsidian internals for Bases change between releases (e.g. 1.14 no longer
+		// exposes embedByExtension.base as a function). Don't let a failed Bases
+		// patch block the property types registered in afterLoad().
+		try {
+			await this.patchBasesController();
+			this.patchBaseResultsValue();
+		} catch (e) {
+			console.error(
+				"Better Properties: Bases integration unavailable; Base/formula-dependent features are disabled.",
+				e
+			);
+		}
 		this.afterLoad();
 	}
 
