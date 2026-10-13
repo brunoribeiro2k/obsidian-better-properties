@@ -72,7 +72,9 @@ export class BetterProperties extends Plugin {
 	 * Read and parse the plugin settings from disk
 	 */
 	async loadSettings(): Promise<void> {
-		const data: unknown = await this.loadData();
+		// A fresh install has no data.json, so loadData() resolves to null; parse
+		// that as empty settings so the schema defaults apply.
+		const data: unknown = (await this.loadData()) ?? {};
 
 		const parsed = v.safeParse(betterPropertiesSettingsSchema, data);
 		if (!parsed.success) {
